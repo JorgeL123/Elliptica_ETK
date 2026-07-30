@@ -1,0 +1,11 @@
+# Configuration for EllipticaImporter
+
+# Header files
+
+CPPFLAGS += -I$(ELLIPTICA_ID_READER_DIR)/include
+
+# Library
+
+LDFLAGS += -L$(ELLIPTICA_ID_READER_DIR)/lib
+LIBS += -lelliptica_id_reader
+

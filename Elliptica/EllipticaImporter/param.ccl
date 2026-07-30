@@ -1,0 +1,36 @@
+# Parameter definitions for thorn EllipticaImporter
+
+SHARES: ADMBase
+
+EXTENDS KEYWORD initial_data
+{
+  "Elliptica" :: "Elliptica initial data"
+}
+
+EXTENDS KEYWORD initial_lapse
+{
+  "Elliptica" :: "Elliptica initial lapse"
+}
+
+EXTENDS KEYWORD initial_shift
+{
+  "Elliptica" :: "Elliptica initial shift"
+}
+
+SHARES: HydroBase
+
+EXTENDS KEYWORD initial_hydro
+{
+  "Elliptica" :: "Elliptica initial hydrodynamic data"
+}
+
+PRIVATE:
+
+STRING checkpoint_path "Path to Elliptica checkpoint file"
+{
+  "" :: "Elliptica checkpoint file"
+} ""
+
+BOOLEAN import_hydro "Import hydrodynamic variables"
+{
+} yes

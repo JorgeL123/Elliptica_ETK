@@ -1,0 +1,9 @@
+ELLIPTICA_ID_READER_DIR = $(CCTK_HOME)/repos/Elliptica_ID_Reader
+
+# Build the library if necessary
+$(shell cd $(ELLIPTICA_ID_READER_DIR) && $(MAKE))
+
+CPPFLAGS += -I$(ELLIPTICA_ID_READER_DIR)/include
+
+LDFLAGS += -L$(ELLIPTICA_ID_READER_DIR)/lib
+LIBS += -lelliptica_id_reader
