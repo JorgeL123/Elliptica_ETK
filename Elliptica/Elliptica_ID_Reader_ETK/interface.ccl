@@ -1,0 +1,3 @@
+IMPLEMENTS: Elliptica_ID_Reader
+
+PROVIDES: Elliptica_ID_Reader
