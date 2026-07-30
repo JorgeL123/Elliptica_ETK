@@ -13,13 +13,13 @@ SCHEDULE EllipticaImporter AT initial
 {
   LANG: C
   WRITES:
-    ADMBase::metric(everywhere)
-    ADMBase::curv(everywhere)
-    ADMBase::lapse(everywhere)
-    ADMBase::shift(everywhere)
-    HydroBase::rho(everywhere)
-    HydroBase::eps(everywhere)
-    HydroBase::press(everywhere)
+    ADMBase::metric(everywhere),
+    ADMBase::curv(everywhere),
+    ADMBase::lapse(everywhere),
+    ADMBase::shift(everywhere),
+    HydroBase::rho(everywhere),
+    HydroBase::eps(everywhere),
+    HydroBase::press(everywhere),
     HydroBase::vel(everywhere)
   SYNC:
     ADMBase::metric
