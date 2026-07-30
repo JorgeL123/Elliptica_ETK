@@ -22,13 +22,13 @@ SCHEDULE EllipticaImporter AT initial
     HydroBase::press(everywhere),
     HydroBase::vel(everywhere)
   SYNC:
-    ADMBase::metric
-    ADMBase::curv
-    ADMBase::lapse
-    ADMBase::shift
-    HydroBase::rho
-    HydroBase::eps
-    HydroBase::press
+    ADMBase::metric,
+    ADMBase::curv,
+    ADMBase::lapse,
+    ADMBase::shift,
+    HydroBase::rho,
+    HydroBase::eps,
+    HydroBase::press,
     HydroBase::vel
   READS:
     grid::coordinates
