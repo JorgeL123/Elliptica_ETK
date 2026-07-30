@@ -1,2 +1,3 @@
-
-#Placeholder
+# Schedule definitions for thorn Elliptica_ID_Reader
+# Este thorn solo actúa de wrapper de enlace con la librería externa;
+# no necesita agendar funciones propias.
