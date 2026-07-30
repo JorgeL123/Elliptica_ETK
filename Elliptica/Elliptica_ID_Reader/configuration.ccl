@@ -1,6 +1,6 @@
 # Configuration definitions for thorn Elliptica_ID_Reader
 
-PROVIDES: Elliptica_ID_Reader
+PROVIDES Elliptica_ID_Reader
 {
   LANG: C
 }
