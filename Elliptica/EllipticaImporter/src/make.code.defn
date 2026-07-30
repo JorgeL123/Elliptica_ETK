@@ -1,3 +1,0 @@
-SRCS = EllipticaImporter.cpp
-
-SUBDIRS =
