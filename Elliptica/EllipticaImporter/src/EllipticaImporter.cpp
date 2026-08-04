@@ -35,6 +35,11 @@ void EllipticaImporter(CCTK_ARGUMENTS)
 
     CCTK_INFO("Initializing Elliptica ID Reader");
 
+    if (CCTK_EQUALS(checkpoint_path, ""))
+    {
+        CCTK_ERROR("EllipticaImporter::checkpoint_path is not set");
+    }
+
     Elliptica_ID_Reader_T *idr =
         elliptica_id_reader_init(
             checkpoint_path,
