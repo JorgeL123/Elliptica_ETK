@@ -31,6 +31,6 @@ SCHEDULE EllipticaImporter AT initial
     HydroBase::press,
     HydroBase::vel
   READS:
-    grid::coordinates
+    grid::x, grid::y, grid::z
   OPTIONS: meta
 } "Import initial data from Elliptica"
