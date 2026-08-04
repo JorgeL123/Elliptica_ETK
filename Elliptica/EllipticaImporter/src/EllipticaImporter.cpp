@@ -1,7 +1,7 @@
 #include <vector>
 #include <string>
 
-#include <elliptica_id_reader.h>
+#include <elliptica_id_reader_lib.h>
 
 #include <cctk.h>
 #include <cctk_Arguments.h>
