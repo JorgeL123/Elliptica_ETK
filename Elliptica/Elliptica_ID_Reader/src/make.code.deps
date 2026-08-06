@@ -1,0 +1,8 @@
+# Main make.code.deps file for thorn Elliptica_ID_Reader
+
+export ELLIPTICA_ID_READER_DIR ELLIPTICA_ID_READER_INC_DIRS ELLIPTICA_ID_READER_LIB_DIRS ELLIPTICA_ID_READER_LIBS
+
+$(CCTK_TARGET) $(OBJS) $(SRCS:%=%.d): $(SCRATCH_BUILD)/done/$(THORN)
+
+$(SCRATCH_BUILD)/done/$(THORN): $(SRCDIR)/get-source.sh
+	+$(SRCDIR)/get-source.sh
