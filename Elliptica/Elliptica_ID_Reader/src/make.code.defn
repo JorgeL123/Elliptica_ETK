@@ -1,7 +1,7 @@
 # make.code.defn for thorn Elliptica_ID_Reader
 
 # Run get-source.sh once while the Makefile is parsed, before compiling anything
-GET_SOURCE_OUTPUT := $(shell $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/get-source.sh 1>&2; echo done)
+GET_SOURCE_OUTPUT := $(shell bash $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/get-source.sh 1>&2; echo done)
 
 # This wrapper thorn has no source files of its own
 SRCS =
