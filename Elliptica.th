@@ -10,7 +10,6 @@
 !CHECKOUT =
 LocalThorns/Boost
 
-
 #Elliptica
 !TARGET   = $ARR/Elliptica/..
 !TYPE     = git
