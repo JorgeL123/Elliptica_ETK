@@ -1,5 +1,7 @@
 # Parameter definitions for thorn EllipticaImporter
 
+SHARES: ADMBase
+
 EXTENDS KEYWORD initial_data
 {
   "EllipticaImporter" :: "Elliptica initial data"
@@ -24,6 +26,8 @@ EXTENDS KEYWORD initial_dtshift
 {
   "EllipticaImporter" :: "Elliptica initial dtshift"
 }
+
+PRIVATE:
 
 CCTK_STRING type "Type of system to import from Elliptica"
 {
