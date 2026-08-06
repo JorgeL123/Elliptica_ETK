@@ -5,7 +5,7 @@
 
 ELLIPTICA_ID_READER_DIR = $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/Elliptica_ID_Reader_src
 
-CPPFLAGS += -I$(ELLIPTICA_ID_READER_DIR)/include
-LDFLAGS  += -L$(ELLIPTICA_ID_READER_DIR)/lib
-LIBS     += -lelliptica_id_reader
+INC_DIRS += $(ELLIPTICA_ID_READER_DIR)/include
+LIB_DIRS += $(ELLIPTICA_ID_READER_DIR)/lib
+LIBS     += elliptica_id_reader
 
