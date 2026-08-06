@@ -1,6 +1,4 @@
 # make.configuration.defn file for thorn EllipticaImporter
-
-INC_DIRS += $(ELLIPTICA_ID_READER_INC_DIRS)
-LIB_DIRS += $(ELLIPTICA_ID_READER_LIB_DIRS)
-LIBS     += $(ELLIPTICA_ID_READER_LIBS)
+# (intentionally empty — INC_DIRS/LIB_DIRS/LIBS are set in make.code.defn instead,
+# since that is the file that actually governs this thorn's own compile flags)
 
