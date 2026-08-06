@@ -1,6 +1,11 @@
-# Configuration for Elliptica_ID_Reader
-# The library itself is fetched and built by get-source.sh (see make.code.defn).
-# This variable is what EllipticaImporter (and any other consumer thorn) should
-# use to find the built include/ and lib/ directories.
+# Configuration for thorn EllipticaImporter
+# The Elliptica_ID_Reader library is built by thorn Elliptica_ID_Reader
+# (see its src/get-source.sh). Path is hardcoded here rather than relying
+# on a variable set in that thorn's make_configuration.defn, since per-thorn
+# make.configuration.defn files are not visible to each other.
 
-ELLIPTICA_ID_READER_DIR := $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/Elliptica_ID_Reader_src
+ELLIPTICA_ID_READER_SRC = $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/Elliptica_ID_Reader_src
+
+CPPFLAGS += -I$(ELLIPTICA_ID_READER_SRC)/include
+LDFLAGS  += -L$(ELLIPTICA_ID_READER_SRC)/lib
+LIBS     += -lelliptica_id_reader
