@@ -8,6 +8,27 @@
 #include <cctk_Parameters.h>
 
 extern "C"
+void EllipticaImporter_check_parameters(CCTK_ARGUMENTS)
+{
+    DECLARE_CCTK_PARAMETERS;
+
+    if (CCTK_EQUALS(checkpoint_path, ""))
+    {
+        CCTK_PARAMWARN("EllipticaImporter::checkpoint_path must be set to "
+                        "the full path of an Elliptica checkpoint file");
+    }
+
+    if (!(CCTK_EQUALS(type, "BBH")  ||
+          CCTK_EQUALS(type, "BH")   ||
+          CCTK_EQUALS(type, "BNS")  ||
+          CCTK_EQUALS(type, "NS")   ||
+          CCTK_EQUALS(type, "BHNS")))
+    {
+        CCTK_PARAMWARN("EllipticaImporter::type must be one of "
+                        "\"BBH\", \"BH\", \"BNS\", \"NS\", \"BHNS\"");
+    }
+}
+extern "C"
 void EllipticaImporter(CCTK_ARGUMENTS)
 {
     DECLARE_CCTK_ARGUMENTS;
