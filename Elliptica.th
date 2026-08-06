@@ -1,3 +1,16 @@
+!CRL_VERSION = 1.0
+
+!INCLUDE = https://bitbucket.org/einsteintoolkit/manifest/raw/master/einsteintoolkit.th
+
+# Boost
+!TARGET   = $ARR
+!TYPE     = git
+!URL      = https://github.com/dradice/Boost.git
+!REPO_PATH= ../$2
+!CHECKOUT =
+LocalThorns/Boost
+
+
 #Elliptica
 !TARGET   = $ARR/Elliptica/..
 !TYPE     = git
