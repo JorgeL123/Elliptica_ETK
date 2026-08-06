@@ -5,4 +5,4 @@ export ELLIPTICA_ID_READER_DIR ELLIPTICA_ID_READER_INC_DIRS ELLIPTICA_ID_READER_
 $(CCTK_TARGET) $(OBJS) $(SRCS:%=%.d): $(SCRATCH_BUILD)/done/$(THORN)
 
 $(SCRATCH_BUILD)/done/$(THORN): $(SRCDIR)/get-source.sh
-	+$(SRCDIR)/get-source.sh
+	+bash $(SRCDIR)/get-source.sh
