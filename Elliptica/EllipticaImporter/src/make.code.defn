@@ -1,3 +1,11 @@
-SRCS = EllipticaImporter.cpp
+# Main make.code.defn file for thorn EllipticaImporter
 
+# Source files in this directory
+SRCS = EllipticaImporter.cpp
+# Subdirectories containing source files
 SUBDIRS =
+
+# Include/library paths for the Elliptica_ID_Reader library
+INC_DIRS += $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/Elliptica_ID_Reader_src/include
+LIB_DIRS += $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/Elliptica_ID_Reader_src/lib
+LIBS     += elliptica_id_reader
