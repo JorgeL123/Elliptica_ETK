@@ -1,6 +1,6 @@
-# Configuration for thorn Elliptica_ID_Reader
-# Nothing needed here: this thorn has no source files of its own
-# (see make.code.defn, in this same src/ directory). The external
-# library is fetched and built by get-source.sh, and its include/lib
-# paths are consumed directly by EllipticaImporter's own
-# src/make.configuration.defn.
+# make.configuration.defn file for thorn Elliptica_ID_Reader
+
+ELLIPTICA_ID_READER_DIR      = $(SRCDIR)/Elliptica_ID_Reader_src
+ELLIPTICA_ID_READER_INC_DIRS = $(ELLIPTICA_ID_READER_DIR)/include
+ELLIPTICA_ID_READER_LIB_DIRS = $(ELLIPTICA_ID_READER_DIR)/lib
+ELLIPTICA_ID_READER_LIBS     = elliptica_id_reader
