@@ -1,12 +1,6 @@
-# make.code.defn for thorn Elliptica_ID_Reader
+# Main make.code.defn file for thorn Elliptica_ID_Reader
 
-# Run get-source.sh once while the Makefile is parsed, before compiling anything
-GET_SOURCE_OUTPUT := $(shell bash $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/get-source.sh 1>&2; echo done)
-
-# This wrapper thorn has no source files of its own
+# Source files in this directory
 SRCS =
-
-# Include/library paths from the already-built external library
-INC_DIRS += $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/Elliptica_ID_Reader_src/include
-LIB_DIRS += $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/Elliptica_ID_Reader_src/lib
-LIBS     += elliptica_id_reader
+# Subdirectories containing source files
+SUBDIRS =
