@@ -1,5 +1,4 @@
 # make.configuration.defn file for thorn EllipticaImporter
 
-LIB_DIRS += $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/Elliptica_ID_Reader_src/lib
-LIBS     += elliptica_id_reader
+LIBS += $(CCTK_HOME)/arrangements/Elliptica/Elliptica_ID_Reader/src/Elliptica_ID_Reader_src/lib/libelliptica_id_reader.a
 
