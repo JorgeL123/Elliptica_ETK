@@ -1,13 +1,13 @@
 # Schedule definitions for thorn EllipticaImporter
 
-STORAGE: ADMBase::metric[0]
-STORAGE: ADMBase::curv[0]
-STORAGE: ADMBase::lapse[0]
-STORAGE: ADMBase::shift[0]
-STORAGE: HydroBase::rho[0]
-STORAGE: HydroBase::eps[0]
-STORAGE: HydroBase::press[0]
-STORAGE: HydroBase::vel[0]
+STORAGE: ADMBase::metric
+STORAGE: ADMBase::curv
+STORAGE: ADMBase::lapse
+STORAGE: ADMBase::shift
+STORAGE: HydroBase::rho
+STORAGE: HydroBase::eps
+STORAGE: HydroBase::press
+STORAGE: HydroBase::vel
 
 SCHEDULE EllipticaImporter AT initial
 {
