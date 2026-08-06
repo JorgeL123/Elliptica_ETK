@@ -1,36 +1,49 @@
 # Schedule definitions for thorn EllipticaImporter
 
-STORAGE: ADMBase::metric
-STORAGE: ADMBase::curv
-STORAGE: ADMBase::lapse
-STORAGE: ADMBase::shift
-STORAGE: HydroBase::rho
-STORAGE: HydroBase::eps
-STORAGE: HydroBase::press
-STORAGE: HydroBase::vel
-
-SCHEDULE EllipticaImporter AT initial
+if (CCTK_EQUALS (initial_data,    "EllipticaImporter") ||
+    CCTK_EQUALS (initial_lapse,   "EllipticaImporter") ||
+    CCTK_EQUALS (initial_shift,   "EllipticaImporter") ||
+    CCTK_EQUALS (initial_dtlapse, "EllipticaImporter") ||
+    CCTK_EQUALS (initial_dtshift, "EllipticaImporter"))
 {
-  LANG: C
-  WRITES:
-    ADMBase::metric(everywhere),
-    ADMBase::curv(everywhere),
-    ADMBase::lapse(everywhere),
-    ADMBase::shift(everywhere),
-    HydroBase::rho(everywhere),
-    HydroBase::eps(everywhere),
-    HydroBase::press(everywhere),
-    HydroBase::vel(everywhere)
-  SYNC:
-    ADMBase::metric,
-    ADMBase::curv,
-    ADMBase::lapse,
-    ADMBase::shift,
-    HydroBase::rho,
-    HydroBase::eps,
-    HydroBase::press,
-    HydroBase::vel
-  READS:
-    grid::x, grid::y, grid::z
-  OPTIONS: meta
-} "Import initial data from Elliptica"
+  SCHEDULE EllipticaImporter_check_parameters AT paramcheck
+  {
+    LANG: C
+  } "Check parameters"
+
+  if (CCTK_EQUALS (type, "BBH"))
+  {
+    SCHEDULE EllipticaImporter IN ADMBase_InitialData
+    {
+      LANG: C
+    } "Set up binary black hole initial data"
+  }
+  if (CCTK_EQUALS (type, "BH"))
+  {
+    SCHEDULE EllipticaImporter IN ADMBase_InitialData
+    {
+      LANG: C
+    } "Set up black hole initial data"
+  }
+  if (CCTK_EQUALS (type, "BNS"))
+  {
+    SCHEDULE EllipticaImporter IN HydroBase_Initial BEFORE ADMBase_PostInitial
+    {
+      LANG: C
+    } "Set up binary neutron star initial data"
+  }
+  if (CCTK_EQUALS (type, "NS"))
+  {
+    SCHEDULE EllipticaImporter IN HydroBase_Initial BEFORE ADMBase_PostInitial
+    {
+      LANG: C
+    } "Set up neutron star initial data"
+  }
+  if (CCTK_EQUALS (type, "BHNS"))
+  {
+    SCHEDULE EllipticaImporter IN HydroBase_Initial BEFORE ADMBase_PostInitial
+    {
+      LANG: C
+    } "Set up black hole neutron star initial data"
+  }
+}
