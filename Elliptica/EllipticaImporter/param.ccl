@@ -27,6 +27,13 @@ EXTENDS KEYWORD initial_dtshift
   "EllipticaImporter" :: "Elliptica initial dtshift"
 }
 
+SHARES: HydroBase
+
+EXTENDS KEYWORD initial_hydro
+{
+  "EllipticaImporter" :: "Elliptica initial hydro data"
+}
+
 PRIVATE:
 
 CCTK_STRING type "Type of system to import from Elliptica"
