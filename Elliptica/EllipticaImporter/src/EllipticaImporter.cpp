@@ -142,6 +142,24 @@ void EllipticaImporter(CCTK_ARGUMENTS)
     const int i_vy = idr->indx("grhd_vy");
     const int i_vz = idr->indx("grhd_vz");
 
+    const int indices[] = {
+        i_alpha, i_betax, i_betay, i_betaz,
+        i_gxx, i_gxy, i_gxz, i_gyy, i_gyz, i_gzz,
+        i_Kxx, i_Kxy, i_Kxz, i_Kyy, i_Kyz, i_Kzz,
+        i_rho, i_eps, i_press, i_vx, i_vy, i_vz
+    };
+    for (int k = 0; k < 22; ++k)
+    {
+        if (indices[k] < 0)
+        {
+            CCTK_ERROR("EllipticaImporter: idr->indx() returned -1 for one "
+                        "or more requested fields -- checkpoint may not "
+                        "contain all fields listed in idr->ifields for "
+                        "this run's type. Aborting before writing to "
+                        "grid functions.");
+        }
+    }
+
     CCTK_INFO("Copying Elliptica data to Cactus grid functions");
 
     #pragma omp parallel for
@@ -184,6 +202,9 @@ void EllipticaImporter(CCTK_ARGUMENTS)
     }
 
     elliptica_id_reader_free(idr);
+
+    CCTK_INFO("Elliptica initial data successfully imported");
+}
 
     CCTK_INFO("Elliptica initial data successfully imported");
 }
