@@ -62,17 +62,6 @@ void EllipticaImporter(CCTK_ARGUMENTS)
         CCTK_ERROR("EllipticaImporter::checkpoint_path is not set");
     }
 
-    /*
-     * "generic" is the batch interpolation mode.
-     *
-     * In this mode we provide the complete coordinate arrays and
-     * idr->npoints before calling elliptica_id_reader_interpolate().
-     * The interpolated fields are then available through
-     *
-     *     idr->field[idr->indx("field_name")][i]
-     *
-     * below.
-     */
     Elliptica_ID_Reader_T *idr =
         elliptica_id_reader_init(
             checkpoint_path,
@@ -144,6 +133,25 @@ void EllipticaImporter(CCTK_ARGUMENTS)
     const int i_vy = idr->indx("grhd_vy");
     const int i_vz = idr->indx("grhd_vz");
 
+    const int indices[] = {
+        i_alpha, i_betax, i_betay, i_betaz,
+        i_gxx, i_gxy, i_gxz, i_gyy, i_gyz, i_gzz,
+        i_Kxx, i_Kxy, i_Kxz, i_Kyy, i_Kyz, i_Kzz,
+        i_rho, i_eps, i_press, i_vx, i_vy, i_vz
+    };
+
+    for (int k = 0; k < 22; ++k)
+    {
+        if (indices[k] < 0)
+        {
+            CCTK_ERROR("EllipticaImporter: idr->indx() returned -1 for one "
+                       "or more requested fields -- checkpoint may not "
+                       "contain all fields listed in idr->ifields for "
+                       "this run's type. Aborting before writing to "
+                       "grid functions.");
+        }
+    }
+
     CCTK_INFO("Copying Elliptica data to Cactus grid functions");
 
     #pragma omp parallel for
@@ -175,10 +183,9 @@ void EllipticaImporter(CCTK_ARGUMENTS)
         eps[i]   = idr->field[i_eps][i];
         press[i] = idr->field[i_press][i];
 
-        // HydroBase::vel[3]
-        vel[i]            = idr->field[i_vx][i];
-        vel[i + npoints]  = idr->field[i_vy][i];
-        vel[i + 2*npoints] = idr->field[i_vz][i];
+        vel[i]              = idr->field[i_vx][i];
+        vel[i + npoints]    = idr->field[i_vy][i];
+        vel[i + 2*npoints]  = idr->field[i_vz][i];
     }
 
     elliptica_id_reader_free(idr);
