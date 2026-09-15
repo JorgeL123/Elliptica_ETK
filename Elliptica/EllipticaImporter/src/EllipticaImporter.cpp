@@ -28,6 +28,7 @@ void EllipticaImporter_check_parameters(CCTK_ARGUMENTS)
                         "\"BBH\", \"BH\", \"BNS\", \"NS\", \"BHNS\"");
     }
 }
+
 extern "C"
 void EllipticaImporter(CCTK_ARGUMENTS)
 {
@@ -40,6 +41,15 @@ void EllipticaImporter(CCTK_ARGUMENTS)
         cctk_lsh[0] *
         cctk_lsh[1] *
         cctk_lsh[2];
+
+    // Stride between vector components (e.g. vel[3]) in Cactus's flat
+    // storage is fixed by the ALLOCATED array shape, not the logical
+    // local shape -- these can differ (e.g. SIMD/vector padding), so
+    // this must NOT be computed from cctk_lsh.
+    const int np_alloc =
+        cctk_ash[0] *
+        cctk_ash[1] *
+        cctk_ash[2];
 
     // Coordinate arrays expected by Elliptica
     std::vector<CCTK_REAL> xx(npoints);
@@ -163,9 +173,14 @@ void EllipticaImporter(CCTK_ARGUMENTS)
         eps[i]   = idr->field[i_eps][i];
         press[i] = idr->field[i_press][i];
 
+        // HydroBase::vel is declared as `CCTK_REAL vel[3] type = GF`: one
+        // flat buffer of 3 * np_alloc elements, components separated by
+        // the ALLOCATED array size (np_alloc), not the logical size
+        // (npoints). This matches the convention used in HydroBase's own
+        // Initialization.c (HydroBase_Zero).
         vel[i]               = idr->field[i_vx][i];
-        vel[i + npoints]     = idr->field[i_vy][i];
-        vel[i + 2*npoints]   = idr->field[i_vz][i];
+        vel[i + np_alloc]    = idr->field[i_vy][i];
+        vel[i + 2*np_alloc]  = idr->field[i_vz][i];
     }
 
     elliptica_id_reader_free(idr);
