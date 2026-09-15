@@ -42,15 +42,6 @@ void EllipticaImporter(CCTK_ARGUMENTS)
         cctk_lsh[1] *
         cctk_lsh[2];
 
-    // Stride between vector components (e.g. vel[3]) in Cactus's flat
-    // storage is fixed by the ALLOCATED array shape, not the logical
-    // local shape -- these can differ (e.g. SIMD/vector padding), so
-    // this must NOT be computed from cctk_lsh.
-    const int np_alloc =
-        cctk_ash[0] *
-        cctk_ash[1] *
-        cctk_ash[2];
-
     // Coordinate arrays expected by Elliptica
     std::vector<CCTK_REAL> xx(npoints);
     std::vector<CCTK_REAL> yy(npoints);
@@ -71,10 +62,21 @@ void EllipticaImporter(CCTK_ARGUMENTS)
         CCTK_ERROR("EllipticaImporter::checkpoint_path is not set");
     }
 
+    /*
+     * "generic" is the batch interpolation mode.
+     *
+     * In this mode we provide the complete coordinate arrays and
+     * idr->npoints before calling elliptica_id_reader_interpolate().
+     * The interpolated fields are then available through
+     *
+     *     idr->field[idr->indx("field_name")][i]
+     *
+     * below.
+     */
     Elliptica_ID_Reader_T *idr =
         elliptica_id_reader_init(
             checkpoint_path,
-            "generic_MT_safe"
+            "generic"
         );
 
     if (idr == nullptr)
@@ -142,24 +144,6 @@ void EllipticaImporter(CCTK_ARGUMENTS)
     const int i_vy = idr->indx("grhd_vy");
     const int i_vz = idr->indx("grhd_vz");
 
-    const int indices[] = {
-        i_alpha, i_betax, i_betay, i_betaz,
-        i_gxx, i_gxy, i_gxz, i_gyy, i_gyz, i_gzz,
-        i_Kxx, i_Kxy, i_Kxz, i_Kyy, i_Kyz, i_Kzz,
-        i_rho, i_eps, i_press, i_vx, i_vy, i_vz
-    };
-    for (int k = 0; k < 22; ++k)
-    {
-        if (indices[k] < 0)
-        {
-            CCTK_ERROR("EllipticaImporter: idr->indx() returned -1 for one "
-                        "or more requested fields -- checkpoint may not "
-                        "contain all fields listed in idr->ifields for "
-                        "this run's type. Aborting before writing to "
-                        "grid functions.");
-        }
-    }
-
     CCTK_INFO("Copying Elliptica data to Cactus grid functions");
 
     #pragma omp parallel for
@@ -191,20 +175,13 @@ void EllipticaImporter(CCTK_ARGUMENTS)
         eps[i]   = idr->field[i_eps][i];
         press[i] = idr->field[i_press][i];
 
-        // HydroBase::vel is declared as `CCTK_REAL vel[3] type = GF`: one
-        // flat buffer of 3 * np_alloc elements, components separated by
-        // the ALLOCATED array size (np_alloc), not the logical size
-        // (npoints). This matches the convention used in HydroBase's own
-        // Initialization.c (HydroBase_Zero).
-        vel[i]               = idr->field[i_vx][i];
-        vel[i + np_alloc]    = idr->field[i_vy][i];
-        vel[i + 2*np_alloc]  = idr->field[i_vz][i];
+        // HydroBase::vel[3]
+        vel[i]            = idr->field[i_vx][i];
+        vel[i + npoints]  = idr->field[i_vy][i];
+        vel[i + 2*npoints] = idr->field[i_vz][i];
     }
 
     elliptica_id_reader_free(idr);
-
-    CCTK_INFO("Elliptica initial data successfully imported");
-}
 
     CCTK_INFO("Elliptica initial data successfully imported");
 }
