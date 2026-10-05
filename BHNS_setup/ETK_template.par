@@ -1,0 +1,771 @@
+####################################################################
+#
+#       BHNS merger parameter file template, driven by Elliptica initial data
+#       via Elliptica_ID_Reader + EllipticaImporter.
+#
+#       Uses IllinoisGRMHD (GRHD) + ML_CCZ4 (spacetime).
+#
+#       This file is a TEMPLATE: double-curly-brace placeholders are filled
+#       in by make_etk_par.py from a source Elliptica.par (and, once available,
+#       Elliptica's solved-output metadata for final BH/NS positions).
+#
+#       Refinement centres:
+#         1 = neutron star
+#         2 = black hole
+#         3 = central/common-horizon region
+#
+#       Apparent horizons:
+#         1 = initial BH horizon
+#         2 = common/remnant horizon
+#
+#       Notes: enable Elliptica_ID_Reader, EllipticaImporter, Boost in your
+#       thornlist.
+#
+####################################################################
+
+
+ActiveThorns = "
+  Elliptica_ID_Reader
+  EllipticaImporter
+  Carpetmask
+  Eos_omni
+  Eos_base
+  Id_converter_ilgrmhd
+  Convert_to_hydrobase
+  ADMBase
+  ADMCoupling
+  ADMMacros
+  AEILocalInterp
+  AHFinderDirect
+  Boundary
+  Carpet
+  CarpetInterp
+  CarpetIOASCII
+  CarpetIOBasic
+  CarpetIOHDF5
+  CarpetIOScalar
+  CarpetLib
+  CarpetReduce
+  CarpetRegrid2
+  CarpetSlab
+  CartGrid3D
+  CoordBase
+  CoordGauge
+  CycleClock
+  Dissipation
+  Fortran
+  GenericFD
+  HydroBase
+  InitBase
+  IOUtil
+  LocalInterp
+  LocalReduce
+  LoopControl
+  ML_ADMConstraints
+  ml_CCZ4
+  ml_CCZ4_helper
+  MoL
+  NaNChecker
+  NewRad
+  Slab
+  SphericalSurface
+  StaticConformal
+  SymBase
+  SystemStatistics
+  TerminationTrigger
+  Time
+  Timers
+  TmunuBase
+  IllinoisGRMHD
+  SummationByParts
+  VolumeIntegrals_GRMHD
+  puncturetracker
+  WeylScal4
+  Multipole
+  QuasiLocalMeasures
+"
+
+
+
+########################################################################
+# Cactus Parameters
+########################################################################
+
+Cactus::cctk_run_title     = "{{RUN_TITLE}}"
+Cactus::cctk_full_warnings = "yes"
+Cactus::highlight_warning_messages = "no"
+
+Cactus::terminate       = "time"
+Cactus::cctk_final_time = 2000.0
+
+
+########################################################################
+# GRID
+########################################################################
+
+Cartgrid3d::type                         = "coordbase"
+
+Carpetlib::check_bboxes                  = no
+Carpetlib::interleave_communications     = yes
+Carpetlib::combine_sends                 = yes
+Carpetlib::poison_value                  = 114
+CarpetLib::poison_new_memory             = "yes"
+CarpetLib::support_staggered_operators   = "yes"
+
+InitBase::initial_data_setup_method      = "init_all_levels"
+
+
+Coordbase::boundary_size_x_lower         = 3
+Coordbase::boundary_size_x_upper         = 3
+Coordbase::boundary_size_y_lower         = 3
+Coordbase::boundary_size_y_upper         = 3
+Coordbase::boundary_size_z_lower         = 3
+Coordbase::boundary_size_z_upper         = 3
+
+coordbase::dx                            = {{GRID_DX}}
+coordbase::dy                            = {{GRID_DX}}
+coordbase::dz                            = {{GRID_DX}}
+
+coordbase::xmax                          = {{GRID_OUTER}}
+coordbase::xmin                          = -{{GRID_OUTER}}
+coordbase::ymax                          = {{GRID_OUTER}}
+coordbase::ymin                          = -{{GRID_OUTER}}
+coordbase::zmax                          = {{GRID_OUTER}}
+coordbase::zmin                          = -{{GRID_OUTER}}
+
+
+Carpetinterp::check_tree_search          = no
+Carpetinterp::tree_search                = yes
+
+
+Carpet::domain_from_coordbase            = "yes"
+Carpet::ghost_size                       = 3
+Carpet::init_fill_timelevels             = "yes"
+Carpet::max_refinement_levels            = 8
+
+Carpet::prolongation_order_space         = 5
+Carpet::prolongation_order_time          = 2
+Carpet::time_refinement_factors          = "[1, 2, 4, 8, 16, 32, 64, 128, 256, 512]"
+Carpet::use_buffer_zones                 = "yes"
+Carpet::verbose                          = "no"
+
+
+########################################################################
+# CARPET REGRID2
+#
+# Three refinement centres:
+#
+#   Centre 1 = NS
+#   Centre 2 = BH
+#   Centre 3 = central/common-horizon region
+#
+# The third centre is not a third physical compact object. It provides
+# the central refinement hierarchy needed for the post-merger/common
+# horizon region.
+########################################################################
+
+Carpetregrid2::num_centres               = 3
+
+Carpetregrid2::freeze_unaligned_levels  = yes
+Carpetregrid2::freeze_unaligned_parent_levels = yes
+
+Carpetregrid2::num_levels_1              = 8
+Carpetregrid2::num_levels_2              = 8
+Carpetregrid2::num_levels_3              = 8
+
+
+#------------------------------------------------------------------------------
+# Centre 1: NS
+#------------------------------------------------------------------------------
+
+Carpetregrid2::position_x_1              = {{NS_POS_X}}
+Carpetregrid2::position_y_1              = {{NS_POS_Y}}
+
+
+#------------------------------------------------------------------------------
+# Centre 2: BH
+#------------------------------------------------------------------------------
+
+Carpetregrid2::position_x_2              = {{BH_POS_X}}
+Carpetregrid2::position_y_2              = {{BH_POS_Y}}
+
+
+#------------------------------------------------------------------------------
+# Centre 3: central/common-horizon region
+#
+# This centre is associated with the region in which the common/remnant
+# apparent horizon is expected to form.
+#
+# For the COM-centred coordinate system used here, the initial location
+# is taken to be the origin.
+#------------------------------------------------------------------------------
+
+Carpetregrid2::position_x_3              = 0.0
+Carpetregrid2::position_y_3              = 0.0
+
+
+##################################################################
+# Region 1 (NS)
+##################################################################
+
+Carpetregrid2::radius_1[1]               = {{REGION_R1}}
+Carpetregrid2::radius_1[2]               = {{REGION_R2}}
+Carpetregrid2::radius_1[3]               = {{REGION_R3}}
+Carpetregrid2::radius_1[4]               = {{REGION_R4}}
+Carpetregrid2::radius_1[5]               = {{REGION_R5}}
+Carpetregrid2::radius_1[6]               = {{REGION_R6}}
+Carpetregrid2::radius_1[7]               = {{REGION_R7}}
+
+
+##################################################################
+# Region 2 (BH)
+##################################################################
+
+Carpetregrid2::radius_2[1]               = {{REGION_R1}}
+Carpetregrid2::radius_2[2]               = {{REGION_R2}}
+Carpetregrid2::radius_2[3]               = {{REGION_R3}}
+Carpetregrid2::radius_2[4]               = {{REGION_R4}}
+Carpetregrid2::radius_2[5]               = {{REGION_R5}}
+Carpetregrid2::radius_2[6]               = {{REGION_R6}}
+Carpetregrid2::radius_2[7]               = {{REGION_R7}}
+
+
+##################################################################
+# Region 3 (central/common-horizon region)
+##################################################################
+
+Carpetregrid2::radius_3[1]               = {{REGION_R1}}
+Carpetregrid2::radius_3[2]               = {{REGION_R2}}
+Carpetregrid2::radius_3[3]               = {{REGION_R3}}
+Carpetregrid2::radius_3[4]               = {{REGION_R4}}
+Carpetregrid2::radius_3[5]               = {{REGION_R5}}
+Carpetregrid2::radius_3[6]               = {{REGION_R6}}
+Carpetregrid2::radius_3[7]               = {{REGION_R7}}
+
+
+##################################################################
+
+Carpetregrid2::regrid_every              = 128
+Carpetregrid2::snap_to_coarse            = "yes"
+
+
+CarpetMask::excluded_surface[0]          = 2
+CarpetMask::excluded_surface_factor[0]   = 1.0
+CarpetMask::verbose                      = "no"
+
+
+Carpet::num_integrator_substeps          = 4
+Mol::mol_intermediate_steps              = 4
+Mol::mol_num_scratch_levels              = 1
+Mol::ode_method                          = "rk4"
+Time::dtfac                              = 0.4
+
+
+########################################################################
+# UTILITY PARAMETERS
+########################################################################
+
+NaNChecker::action_if_found = "terminate"
+NaNChecker::check_every     = 64
+
+NaNChecker::check_vars      = "
+  ADMBase::curv
+  ADMBase::dtlapse
+  ADMBase::dtshift
+  ADMBase::lapse
+  ADMBase::metric
+  ADMBase::shift
+  HydroBase::rho
+  HydroBase::eps
+  HydroBase::press
+  HydroBase::vel
+  HydroBase::w_lorentz
+  IllinoisGRMHD::rho_b
+"
+
+NaNChecker::verbose         = "all"
+
+
+########################################################################
+# ID SETUP
+########################################################################
+
+ADMBase::lapse_timelevels               = 3
+ADMBase::shift_timelevels               = 3
+ADMBase::metric_timelevels              = 3
+
+ADMBase::initial_data                   = "EllipticaImporter"
+ADMBase::initial_lapse                  = "EllipticaImporter"
+ADMBase::initial_shift                  = "EllipticaImporter"
+
+ADMBase::initial_dtlapse                = "zero"
+ADMBase::initial_dtshift                = "zero"
+ADMBase::metric_type                    = physical
+
+EllipticaImporter::type                 = "{{ID_TYPE}}"
+EllipticaImporter::checkpoint_path      = "{{CHECKPOINT_PATH}}"
+
+HydroBase::initial_hydro                = "EllipticaImporter"
+Hydrobase::initial_avec                 = "zero"
+Hydrobase::initial_aphi                 = "zero"
+HydroBase::timelevels                   = 3
+
+
+########################################################################
+# EQUATION OF STATE
+########################################################################
+
+{{EOS_BLOCK}}
+
+
+########################################################################
+# HYDRO EVOLUTION
+########################################################################
+
+illinoisgrmhd::symmetry                  = "none"
+illinoisgrmhd::rho_b_max                 = 100000
+illinoisgrmhd::update_tmunu              = yes
+illinoisgrmhd::conserv_to_prims_debug    = 0
+illinoisgrmhd::psi6threshold             = 60
+illinoisgrmhd::damp_lorenz               = 0.25
+illinoisgrmhd::tau_atm                   = 1e-10
+illinoisgrmhd::rho_b_atm                 = 1e-10
+illinoisgrmhd::verbose                   = "no"
+
+ADMMacros::spatial_order                 = 4
+
+
+########################################################################
+# SPACETIME EVOLUTION
+########################################################################
+
+ML_CCZ4::rhs_boundary_condition           = "NewRad"
+ML_CCZ4::initial_boundary_condition       = "extrapolate-gammas"
+
+ml_CCZ4::betadriver                       = 0.2
+ml_CCZ4::harmonicf                        = 2
+ml_CCZ4::harmonicn                        = 1
+ml_CCZ4::minimumlapse                     = 1e-08
+ml_CCZ4::shiftgammacoeff                  = 0.75
+ML_CCZ4::dampk1                           = 0.02
+
+ML_CCZ4::spatialBetaDriverRadius          = {{REGION_R2}}
+
+Boundary::radpower                       = 2
+
+admbase::dtlapse_evolution_method         = "ML_CCZ4"
+admbase::dtshift_evolution_method         = "ML_CCZ4"
+admbase::evolution_method                 = "ML_CCZ4"
+admbase::lapse_evolution_method           = "ML_CCZ4"
+admbase::shift_evolution_method           = "ML_CCZ4"
+
+
+########################################################################
+# DISSIPATION
+########################################################################
+
+Dissipation::epsdis                       = 0.1
+Dissipation::order                        = 5
+
+Dissipation::vars                          = "
+        ML_CCZ4::ML_log_confac
+        ML_CCZ4::ML_metric
+        ML_CCZ4::ML_trace_curv
+        ML_CCZ4::ML_curv
+        ML_CCZ4::ML_Gamma
+        ML_CCZ4::ML_lapse
+        ML_CCZ4::ML_shift
+        ML_CCZ4::ML_dtlapse
+        ML_CCZ4::ML_dtshift
+"
+
+
+########################################################################
+# SPHERICAL SURFACE
+########################################################################
+
+SphericalSurface::nsurfaces             = 9
+SphericalSurface::maxntheta             = 140
+SphericalSurface::maxnphi               = 240
+
+
+#------------------------------------------------------------------------------
+# Dynamic surfaces 0-3
+#------------------------------------------------------------------------------
+
+SphericalSurface::ntheta[0]             = 55
+SphericalSurface::nphi[0]               = 96
+SphericalSurface::nghoststheta[0]       = 2
+SphericalSurface::nghostsphi[0]         = 2
+
+SphericalSurface::ntheta[1]             = 55
+SphericalSurface::nphi[1]               = 96
+SphericalSurface::nghoststheta[1]       = 2
+SphericalSurface::nghostsphi[1]         = 2
+
+SphericalSurface::ntheta[2]             = 55
+SphericalSurface::nphi[2]               = 96
+SphericalSurface::nghoststheta[2]       = 2
+SphericalSurface::nghostsphi[2]         = 2
+
+SphericalSurface::ntheta[3]             = 55
+SphericalSurface::nphi[3]               = 96
+SphericalSurface::nghoststheta[3]       = 2
+SphericalSurface::nghostsphi[3]         = 2
+
+
+#------------------------------------------------------------------------------
+# Fixed extraction surfaces
+#------------------------------------------------------------------------------
+
+SphericalSurface::ntheta[4]              = 55
+SphericalSurface::nphi[4]                = 96
+SphericalSurface::nghoststheta[4]        = 2
+SphericalSurface::nghostsphi[4]          = 2
+SphericalSurface::set_spherical[4]       = yes
+SphericalSurface::radius[4]              = 50
+
+SphericalSurface::ntheta[5]              = 55
+SphericalSurface::nphi[5]                = 96
+SphericalSurface::nghoststheta[5]        = 2
+SphericalSurface::nghostsphi[5]          = 2
+SphericalSurface::set_spherical[5]       = yes
+SphericalSurface::radius[5]              = 100
+
+SphericalSurface::ntheta[6]              = 55
+SphericalSurface::nphi[6]                = 96
+SphericalSurface::nghoststheta[6]        = 2
+SphericalSurface::nghostsphi[6]          = 2
+SphericalSurface::set_spherical[6]       = yes
+SphericalSurface::radius[6]              = 200
+
+SphericalSurface::ntheta[7]              = 55
+SphericalSurface::nphi[7]                = 96
+SphericalSurface::nghoststheta[7]        = 2
+SphericalSurface::nghostsphi[7]          = 2
+SphericalSurface::set_spherical[7]       = yes
+SphericalSurface::radius[7]              = 300
+
+SphericalSurface::ntheta[8]              = 55
+SphericalSurface::nphi[8]                = 96
+SphericalSurface::nghoststheta[8]        = 2
+SphericalSurface::nghostsphi[8]          = 2
+SphericalSurface::set_spherical[8]       = yes
+SphericalSurface::radius[8]              = 400
+
+
+tmunubase::prolongation_type             = "none"
+tmunubase::stress_energy_at_rhs          = "yes"
+tmunubase::stress_energy_storage         = "yes"
+tmunubase::timelevels                    = 3
+
+
+########################################################################
+# AH FINDER
+########################################################################
+
+AHFinderDirect::find_every = 16
+
+AHFinderDirect::max_allowable_Theta_growth_iterations    = 10
+AHFinderDirect::max_allowable_Theta_nonshrink_iterations = 10
+
+AHFinderDirect::move_origins            = yes
+AHFinderDirect::reshape_while_moving    = yes
+AHFinderDirect::predict_origin_movement = yes
+
+AHFinderDirect::geometry_interpolator_name = "Lagrange polynomial interpolation"
+AHFinderDirect::geometry_interpolator_pars = "order=4"
+
+AHFinderDirect::surface_interpolator_name  = "Lagrange polynomial interpolation"
+AHFinderDirect::surface_interpolator_pars  = "order=4"
+
+AHFinderDirect::output_h_every = 64
+
+
+#------------------------------------------------------------------------------
+# Apparent horizons
+#------------------------------------------------------------------------------
+
+AHFinderDirect::N_horizons = 2
+
+
+#------------------------------------------------------------------------------
+# Horizon 1: initial black-hole horizon
+#------------------------------------------------------------------------------
+
+AHFinderDirect::origin_x[1] = {{BH_POS_X}}
+AHFinderDirect::origin_y[1] = {{BH_POS_Y}}
+AHFinderDirect::origin_z[1] = 0.0
+
+AHFinderDirect::initial_guess__coord_sphere__x_center[1] = {{BH_POS_X}}
+AHFinderDirect::initial_guess__coord_sphere__y_center[1] = {{BH_POS_Y}}
+AHFinderDirect::initial_guess__coord_sphere__radius[1] = {{AH_INIT_RADIUS}}
+
+AHFinderDirect::track_origin_from_grid_scalar[1] = yes
+
+AHFinderDirect::track_origin_source_x                [1] = "PunctureTracker::pt_loc_x[0]"
+AHFinderDirect::track_origin_source_y                [1] = "PunctureTracker::pt_loc_y[0]"
+AHFinderDirect::track_origin_source_z                [1] = "PunctureTracker::pt_loc_z[0]"
+
+AHFinderDirect::max_allowable_horizon_radius[1] = {{AH_MAX_RADIUS}}
+
+# BH horizon -> spherical surface 2
+AHFinderDirect::which_surface_to_store_info[1] = 2
+
+
+#------------------------------------------------------------------------------
+# Horizon 2: common/remnant horizon
+#
+# The common horizon is initially searched around the central refinement
+# region, i.e. around the origin of the COM-centred coordinate system.
+#------------------------------------------------------------------------------
+
+AHFinderDirect::origin_x[2] = 0.0
+AHFinderDirect::origin_y[2] = 0.0
+AHFinderDirect::origin_z[2] = 0.0
+
+AHFinderDirect::initial_guess__coord_sphere__x_center[2] = 0.0
+AHFinderDirect::initial_guess__coord_sphere__y_center[2] = 0.0
+AHFinderDirect::initial_guess__coord_sphere__radius[2] = 12.0
+AHFinderDirect::find_after_individual_time[2] = 100.0
+AHFinderDirect::reset_horizon_after_not_finding[2] = no
+
+AHFinderDirect::max_allowable_horizon_radius[2] = 20.0
+
+# Common horizon -> spherical surface 3
+AHFinderDirect::which_surface_to_store_info[2] = 3
+
+
+########################################################################
+# OUTPUT
+########################################################################
+
+IOScalar::one_file_per_group            = yes
+IOASCII::one_file_per_group             = yes
+
+IOBasic::outInfo_every                  = 4
+
+IOBasic::outInfo_reductions             = "minimum maximum"
+
+IOBasic::outInfo_vars                   = "
+  Carpet::physical_time_per_hour
+  ML_ADMConstraints::ML_Ham
+  HydroBase::w_lorentz
+  IllinoisGRMHD::rho_b
+"
+
+
+IOScalar::outScalar_every               = 256
+
+IOScalar::outScalar_vars                = "
+  SystemStatistics::process_memory_mb
+  ML_ADMConstraints::ML_Ham
+  ADMBase::lapse
+  ADMBase::shift
+  ADMBase::metric
+  ADMBase::curv
+  HydroBase::rho
+  HydroBase::vel
+  HydroBase::w_lorentz
+  IllinoisGRMHD::rho_b
+"
+
+
+IOASCII::out0D_every                    = 256
+
+IOASCII::out0D_vars                     = "
+  Carpet::timing
+  PunctureTracker::pt_loc
+  PunctureTracker::pt_vel
+  QuasiLocalMeasures::qlm_scalars
+  SphericalSurface::sf_active
+  SphericalSurface::sf_valid
+  SphericalSurface::sf_info
+  SphericalSurface::sf_radius
+  SphericalSurface::sf_origin
+  SphericalSurface::sf_coordinate_descriptors
+"
+
+
+IOASCII::out1D_every                    = 256
+IOASCII::out1D_d                        = no
+IOASCII::out1D_x                        = yes
+IOASCII::out1D_y                        = no
+IOASCII::out1D_z                        = yes
+
+IOASCII::out1D_vars                     = "
+  ML_CCZ4::ML_log_confac
+  ML_CCZ4::ML_trace_curv
+  ADMBase::lapse
+  ADMBase::shift
+  ADMBase::metric
+  ADMBase::curv
+  ML_ADMConstraints::ML_Ham
+  IllinoisGRMHD::rho_b
+  IllinoisGRMHD::P
+  IllinoisGRMHD::vx
+  IllinoisGRMHD::vy
+  IllinoisGRMHD::vz
+"
+
+
+IOHDF5::out_every                       = 200000
+
+IOHDF5::out_vars                        = "
+  ML_CCZ4::ML_log_confac
+"
+
+
+IOHDF5::out2D_every                     = 512
+
+IOHDF5::out2D_vars                      = "
+  ML_CCZ4::alpha
+  ML_CCZ4::phi
+  ML_CCZ4::trK
+  CarpetReduce::weight
+  Grid::coordinates
+  HydroBase::rho
+  HydroBase::vel
+  HydroBase::eps
+  ADMBase::lapse
+  ADMBase::shift
+  ADMBase::metric
+  ML_ADMConstraints::ML_Ham
+  WeylScal4::Psi4r
+  WeylScal4::Psi4i
+"
+
+
+########################################################################
+# CHECKPOINT
+########################################################################
+
+CarpetIOHDF5::checkpoint                       = "yes"
+CarpetIOHDF5::use_reflevels_from_checkpoint    = "yes"
+
+IOUtil::abort_on_io_errors                     = "yes"
+IOUtil::checkpoint_on_terminate                = "yes"
+
+IO::checkpoint_every_walltime_hours            = 29
+
+IOUtil::checkpoint_keep                        = 2
+
+IO::recover                                    = "autoprobe"
+
+IO::checkpoint_dir                             = "../CHECKPOINTS"
+IO::recover_dir                                = "../CHECKPOINTS"
+
+IOUtil::out_dir                                = "./data/"
+
+IOUtil::strict_io_parameter_check               = "yes"
+IO::parfile_write                              = "copy"
+
+
+########################################################################
+# TRACK NS
+########################################################################
+
+VolumeIntegrals_GRMHD::NumIntegrals             = 4
+VolumeIntegrals_GRMHD::VolIntegral_out_every    = 128
+VolumeIntegrals_GRMHD::outVolIntegral_dir      = "volume_integration"
+VolumeIntegrals_GRMHD::verbose                 = 0
+
+
+# Integral 1: volume
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[1] = "one"
+
+
+# Integral 2: NS centre of mass
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[2] = "centerofmass"
+
+VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[2] = {{NS_POS_X}}
+VolumeIntegrals_GRMHD::volintegral_sphere__center_y_initial[2] = {{NS_POS_Y}}
+
+VolumeIntegrals_GRMHD::volintegral_inside_sphere__radius[2] = 13
+
+VolumeIntegrals_GRMHD::amr_centre__tracks__volintegral_inside_sphere[2] = 1
+
+
+# Integral 3: NS volume
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[3] = "one"
+
+VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[3] = {{NS_POS_X}}
+VolumeIntegrals_GRMHD::volintegral_sphere__center_y_initial[3] = {{NS_POS_Y}}
+
+VolumeIntegrals_GRMHD::volintegral_inside_sphere__radius[3] = 13
+
+
+# Integral 4: rest mass
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[4] = "restmass"
+
+
+########################################################################
+# TRACK BH
+########################################################################
+
+PunctureTracker::initial_x[0]                    = {{BH_POS_X}}
+PunctureTracker::initial_y[0]                    = {{BH_POS_Y}}
+
+PunctureTracker::track[0]                        = "yes"
+PunctureTracker::verbose                         = "no"
+
+PunctureTracker::which_surface_to_store_info[0] = 0
+
+
+########################################################################
+# GW
+########################################################################
+
+WeylScal4::offset                       = 1.0e-8
+WeylScal4::fd_order                     = "4th"
+WeylScal4::verbose                      = 0
+
+
+Multipole::nradii                       = 5
+multipole::out_every                    = 256
+
+Multipole::radius[0]                    = 100
+Multipole::radius[1]                    = 200
+Multipole::radius[2]                    = 300
+Multipole::radius[3]                    = 400
+Multipole::radius[4]                    = 500
+
+Multipole::ntheta                       = 120
+Multipole::nphi                         = 240
+
+Multipole::variables                    = "
+  WeylScal4::Psi4r{sw=-2 cmplx='WeylScal4::Psi4i' name='psi4'}
+"
+
+Multipole::l_max                        = 8
+Multipole::output_hdf5                  = yes
+
+
+########################################################################
+# QUASI-LOCAL MEASURES
+########################################################################
+#
+# Surface 2 = BH apparent horizon
+# Surface 3 = common/remnant apparent horizon
+#
+# Include both so that QLM can provide quantities for both horizons.
+########################################################################
+
+QuasiLocalMeasures::interpolator         = "Lagrange polynomial interpolation"
+QuasiLocalMeasures::interpolator_options = "order=4"
+
+QuasiLocalMeasures::spatial_order         = 4
+
+QuasiLocalMeasures::num_surfaces          = 2
+
+QuasiLocalMeasures::surface_index[0]      = 2
+QuasiLocalMeasures::surface_index[1]      = 3
+
+Quasilocalmeasures::output_vtk_every      = 64
+
+
+########################################################################
+# CONVERT TO HYDROBASE
+########################################################################
+
+Convert_to_HydroBase::Convert_to_HydroBase_every = 4
